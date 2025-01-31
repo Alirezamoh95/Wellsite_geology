@@ -185,11 +185,12 @@ def upload_file():
             filepath = os.path.join(app.config["UPLOAD_FOLDER"], filename)
             file.save(filepath)
 
-            # Process image and generate PDF
-            pdf_path = detect_cuttings(filepath)
+            processed_image_path, pdf_path = detect_cuttings(filepath)
 
-            # Send PDF file as response
-            return send_file(pdf_path, as_attachment=True)
+            return jsonify({
+                "processed_image_url": url_for('static', filename='processed/processed_image.png'),
+                "pdf_url": url_for('static', filename='processed/cuttings_report.pdf')
+            })
 
     return render_template("index.html")
 
