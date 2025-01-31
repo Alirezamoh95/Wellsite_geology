@@ -103,7 +103,7 @@ document.getElementById("fileInput").addEventListener("change", function(event) 
         .then(data => {
             document.getElementById("previewImg").src = data.processed_image_url;
             document.getElementById("downloadPdf").href = data.pdf_url;
-
+            document.getElementById("downloadPdf").style.display = "block";  // Show button
             document.querySelector(".loading").style.display = "none";
             document.querySelector(".preview-container").style.display = "block";
         })
@@ -112,7 +112,7 @@ document.getElementById("fileInput").addEventListener("change", function(event) 
             alert("Error processing file. Please try again.");
             document.querySelector(".loading").style.display = "none";
         });
-    }
+            }
 });
 </script>
 
