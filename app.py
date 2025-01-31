@@ -1,7 +1,7 @@
 import os
 import cv2
 import numpy as np
-from flask import Flask, request, render_template, send_file
+from flask import Flask, request, render_template, send_file, jsonify, url_for
 from sklearn.cluster import KMeans
 from scipy.spatial import KDTree
 from fpdf import FPDF
@@ -106,7 +106,7 @@ def classify_cutting(contour):
 
 
 def generate_pdf_report(image_path, processed_image_path, report):
-    """Generate a PDF report with cutting details"""
+    """Generate PDF report with cuttings details."""
     pdf = FPDF()
     pdf.set_auto_page_break(auto=True, margin=15)
     pdf.add_page()
