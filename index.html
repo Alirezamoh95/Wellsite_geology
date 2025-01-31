@@ -86,34 +86,34 @@
 </div>
 
 <script>
-    document.getElementById("fileInput").addEventListener("change", function(event) {
-        let file = event.target.files[0];
-        if (file) {
-            let formData = new FormData();
-            formData.append("file", file);
-            
-            document.querySelector(".loading").style.display = "block";
-            document.querySelector(".preview-container").style.display = "none";
+document.getElementById("fileInput").addEventListener("change", function(event) {
+    let file = event.target.files[0];
+    if (file) {
+        let formData = new FormData();
+        formData.append("file", file);
+        
+        document.querySelector(".loading").style.display = "block";
+        document.querySelector(".preview-container").style.display = "none";
 
-            fetch("/", {
-                method: "POST",
-                body: formData
-            })
-            .then(response => response.blob())
-            .then(blob => {
-                let url = URL.createObjectURL(blob);
-                
-                document.getElementById("downloadPdf").href = url;
-                document.querySelector(".loading").style.display = "none";
-                document.querySelector(".preview-container").style.display = "block";
-            })
-            .catch(error => {
-                console.error("Error:", error);
-                alert("Error processing file. Please try again.");
-                document.querySelector(".loading").style.display = "none";
-            });
-        }
-    });
+        fetch("/", {
+            method: "POST",
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById("previewImg").src = data.processed_image_url;
+            document.getElementById("downloadPdf").href = data.pdf_url;
+
+            document.querySelector(".loading").style.display = "none";
+            document.querySelector(".preview-container").style.display = "block";
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            alert("Error processing file. Please try again.");
+            document.querySelector(".loading").style.display = "none";
+        });
+    }
+});
 </script>
 
 </body>
