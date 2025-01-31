@@ -28,6 +28,31 @@ munsell_color_rgb_mapping = {
     "Dusky Red": (150, 60, 60),
     "Blackish Red": (140, 50, 50),
     "Very Dark Red": (130, 40, 40),
+    "Grayish Orange": (230, 180, 150),
+    "Moderate Orange Pink": (240, 170, 140),
+    "Pale Yellow": (230, 220, 150),
+    "Dark Yellowish Orange": (210, 160, 100),
+    "Moderate Brown": (150, 100, 80),
+    "Dusky Yellowish Brown": (120, 90, 70),
+    "Grayish Yellow": (200, 180, 100),
+    "Yellowish Gray": (190, 170, 120),
+    "Olive Gray": (150, 140, 110),
+    "Dark Greenish Gray": (80, 100, 90),
+    "Light Green": (160, 210, 130),
+    "Moderate Green": (100, 160, 100),
+    "Pale Blue": (180, 200, 230),
+    "Grayish Blue": (120, 140, 180),
+    "Moderate Blue": (100, 120, 200),
+    "Dusky Blue": (90, 110, 160),
+    "Very Dusky Purple": (80, 60, 90),
+    "Pale Olive": (170, 160, 90),
+    "Olive Brown": (120, 110, 80),
+    "Dark Olive": (100, 90, 60),
+    "Bluish Gray": (100, 120, 140),
+    "Light Brownish Gray": (160, 140, 120),
+    "Medium Gray": (120, 120, 120),
+    "Dark Gray": (80, 80, 80),
+    "Black": (30, 30, 30)
 }
 
 # Build KDTree for fast color lookup
@@ -39,11 +64,18 @@ def closest_munsell_color(dominant_color):
     _, index = munsell_color_tree.query(dominant_color)
     return list(munsell_color_rgb_mapping.keys())[index]
 
+
+
 def classify_cutting(contour):
-    """Classify shape based on aspect ratio"""
     x, y, w, h = cv2.boundingRect(contour)
     aspect_ratio = float(w) / h
-    shape = "Undefined"
+    area = cv2.contourArea(contour)
+    perimeter = cv2.arcLength(contour, True)
+    circularity = (4 * np.pi * area) / (perimeter ** 2) if perimeter > 0 else 0
+    convex_hull = cv2.convexHull(contour)
+    convex_area = cv2.contourArea(convex_hull)
+    convexity = area / convex_area if convex_area > 0 else 0
+
     if aspect_ratio > 3:
         shape = "Very Elongate"
     elif 2 < aspect_ratio <= 3:
@@ -52,9 +84,26 @@ def classify_cutting(contour):
         shape = "Sub-Elongate"
     elif 1.2 < aspect_ratio <= 1.5:
         shape = "Sub-Spherical"
-    else:
+    elif 0.9 < aspect_ratio <= 1.2:
         shape = "Spherical"
-    return shape
+    else:
+        shape = "Very Spherical (Equant)"
+    
+    if circularity > 0.8 and convexity > 0.9:
+        roundness = "Well Rounded"
+    elif circularity > 0.7:
+        roundness = "Rounded"
+    elif circularity > 0.6:
+        roundness = "Subrounded"
+    elif circularity > 0.5:
+        roundness = "Subangular"
+    elif circularity > 0.4:
+        roundness = "Angular"
+    else:
+        roundness = "Very Angular"
+
+    return shape,roundness
+
 
 def generate_pdf_report(image_path, processed_image_path, report):
     """Generate a PDF report with cutting details"""
