@@ -187,10 +187,15 @@ def upload_file():
             file.save(filepath)
 
             processed_image_path, pdf_path = detect_cuttings(filepath)
-
+            """
             return jsonify({
                 "processed_image_url": url_for('static', filename='processed/processed_image.png'),
                 "pdf_url": url_for('download_pdf')  # Correctly serve the PDF
+            })
+            """
+            return jsonify({
+                "processed_image_url": request.host_url + "static/processed/processed_image.png",
+                "pdf_url": request.host_url + "download-pdf"
             })
 
     return render_template("index.html")
