@@ -124,7 +124,8 @@ def generate_pdf_report(image_path, processed_image_path, report):
     for desc in report:
         pdf.multi_cell(0, 10, desc)
 
-    pdf_path = os.path.join(PDF_FOLDER, "cuttings_report.pdf")
+    pdf_path = os.path.join(PROCESSED_FOLDER, "cuttings_report.pdf")  # Save in "static/processed/"
+
     pdf.output(pdf_path)
     return pdf_path
 
@@ -189,10 +190,15 @@ def upload_file():
 
             return jsonify({
                 "processed_image_url": url_for('static', filename='processed/processed_image.png'),
-                "pdf_url": url_for('static', filename='processed/cuttings_report.pdf')
+                "pdf_url": url_for('download_pdf')  # Correctly serve the PDF
             })
 
     return render_template("index.html")
+
+@app.route("/download-pdf")
+def download_pdf():
+    pdf_path = os.path.join(PROCESSED_FOLDER, "cuttings_report.pdf")
+    return send_file(pdf_path, as_attachment=True)
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=10000)
