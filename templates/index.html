@@ -2,13 +2,105 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Upload Cuttings Image</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuttings Detection App</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 600px;
+            margin-top: 50px;
+            padding: 30px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        .upload-area {
+            text-align: center;
+            padding: 20px;
+            border: 2px dashed #007bff;
+            border-radius: 10px;
+            background-color: #f1f8ff;
+            cursor: pointer;
+        }
+        .upload-area:hover {
+            background-color: #e0f2ff;
+        }
+        #fileInput {
+            display: none;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .preview-container {
+            display: none;
+            margin-top: 20px;
+            text-align: center;
+        }
+        .preview-img {
+            max-width: 100%;
+            border-radius: 10px;
+            border: 2px solid #007bff;
+        }
+    </style>
 </head>
 <body>
-    <h2>Upload Cuttings Image</h2>
-    <form action="/" method="post" enctype="multipart/form-data">
-        <input type="file" name="file">
-        <input type="submit" value="Upload">
-    </form>
+
+<div class="container">
+    <h2 class="text-center">Upload Cuttings Image</h2>
+    
+    <div class="upload-area" onclick="document.getElementById('fileInput').click();">
+        <p>Click or Drag & Drop to Upload Image</p>
+        <input type="file" id="fileInput" accept="image/*">
+    </div>
+
+    <div class="loading">
+        <div class="spinner-border text-primary" role="status"></div>
+        <p>Processing...</p>
+    </div>
+
+    <div class="preview-container">
+        <h5>Processed Image:</h5>
+        <img id="previewImg" class="preview-img" src="#" alt="Processed Image">
+        <br>
+        <a id="downloadPdf" class="btn btn-success mt-3" href="#" download="cuttings_report.pdf">Download PDF Report</a>
+    </div>
+</div>
+
+<script>
+    document.getElementById("fileInput").addEventListener("change", function(event) {
+        let file = event.target.files[0];
+        if (file) {
+            let formData = new FormData();
+            formData.append("file", file);
+            
+            document.querySelector(".loading").style.display = "block";
+            document.querySelector(".preview-container").style.display = "none";
+
+            fetch("/", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.blob())
+            .then(blob => {
+                let url = URL.createObjectURL(blob);
+                
+                document.getElementById("downloadPdf").href = url;
+                document.querySelector(".loading").style.display = "none";
+                document.querySelector(".preview-container").style.display = "block";
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("Error processing file. Please try again.");
+                document.querySelector(".loading").style.display = "none";
+            });
+        }
+    });
+</script>
+
 </body>
 </html>
