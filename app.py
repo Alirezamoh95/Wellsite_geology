@@ -170,7 +170,7 @@ def detect_cuttings(image_path):
     # Generate PDF Report
     pdf_path = generate_pdf_report(image_path, processed_image_path, report)
 
-    return pdf_path
+    return processed_image_path,pdf_path
 
 @app.route("/", methods=["GET", "POST"])
 def upload_file():
